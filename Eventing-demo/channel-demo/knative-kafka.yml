@@ -1,0 +1,23 @@
+apiVersion: operator.serverless.openshift.io/v1alpha1
+kind: KnativeKafka
+spec:
+  broker:
+    defaultConfig:
+      authSecretName: ''
+      bootstrapServers: 'my-cluster-kafka-bootstrap.kafka-server.svc.cluster.local:9092'
+      numPartitions: 10
+      replicationFactor: 3
+    enabled: true
+  channel:
+    authSecretName: ''
+    authSecretNamespace: ''
+    bootstrapServers: 'my-cluster-kafka-bootstrap.kafka-server.svc.cluster.local:9092'
+    enabled: true
+  high-availability:
+    replicas: 1
+  logging:
+    level: INFO
+  sink:
+    enabled: true
+  source:
+    enabled: true

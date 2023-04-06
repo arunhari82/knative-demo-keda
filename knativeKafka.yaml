@@ -6,13 +6,13 @@ metadata:
 spec:
     channel:
         enabled: true
-        bootstrapServers: my-cluster-kafka-bootstrap.amq-streams.svc.cluster.local:9092
+        bootstrapServers: my-cluster-kafka-bootstrap.kafka-server.svc.cluster.local:9092
     source:
         enabled: true
     broker:
         enabled: true
         defaultConfig:
-            bootstrapServers: my-cluster-kafka-bootstrap.amq-streams.svc.cluster.local:9092
+            bootstrapServers: my-cluster-kafka-bootstrap.kafka-server.svc.cluster.local:9092
             numPartitions: 10
             replicationFactor: 3
     sink:

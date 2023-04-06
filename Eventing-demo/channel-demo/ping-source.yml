@@ -1,0 +1,23 @@
+apiVersion: sources.knative.dev/v1
+kind: PingSource
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+    sources.knative.dev/creator: opentlc-mgr
+    sources.knative.dev/lastModifier: opentlc-mgr
+  name: ping-source
+  generation: 3
+  labels:
+    app: ping-source
+    app.kubernetes.io/component: ping-source
+    app.kubernetes.io/instance: ping-source
+    app.kubernetes.io/name: ping-source
+    app.kubernetes.io/part-of: channel-demo
+spec:
+  data: '{"message": "Welcome to Knative Eventing!"}'
+  schedule: '*/1 * * * *'
+  sink:
+    ref:
+      apiVersion: messaging.knative.dev/v1beta1
+      kind: KafkaChannel
+      name: kafka-channel

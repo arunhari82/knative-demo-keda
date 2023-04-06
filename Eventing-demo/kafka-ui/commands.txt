@@ -1,0 +1,8 @@
+# Add Repo
+helm repo add kafka-ui https://provectus.github.io/kafka-ui
+
+# Create Config Map
+
+
+# Install Kafka-UI
+helm install kafka-ui kafka-ui/kafka-ui --set yamlApplicationConfigConfigMap.name="kafka-ui-config",yamlApplicationConfigConfigMap.keyName="config.yml"

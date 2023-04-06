@@ -1,0 +1,24 @@
+apiVersion: eventing.knative.dev/v1
+kind: Broker
+metadata:
+  annotations:
+    eventing.knative.dev/broker.class: Kafka
+    eventing.knative.dev/creator: opentlc-mgr
+    eventing.knative.dev/lastModifier: opentlc-mgr
+    kafka.eventing.knative.dev/external.topic: knative.kafka.broker.demo
+  name: broker-demo
+  generation: 1
+  finalizers:
+    - brokers.eventing.knative.dev
+  labels:
+    app.kubernetes.io/part-of: broker-demo
+spec:
+  config:
+    apiVersion: v1
+    kind: ConfigMap
+    name: kafka-broker-config
+    namespace: knative-eventing
+  delivery:
+    backoffDelay: PT0.2S
+    backoffPolicy: exponential
+    retry: 10

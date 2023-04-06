@@ -1,0 +1,35 @@
+apiVersion: sources.knative.dev/v1beta1
+kind: KafkaSource
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  name: kafka-source
+  generation: 2
+  labels:
+    app: kafka-source
+    app.kubernetes.io/component: kafka-source
+    app.kubernetes.io/instance: kafka-source
+    app.kubernetes.io/name: kafka-source
+    app.kubernetes.io/part-of: channel-demo
+spec:
+  bootstrapServers:
+    - 'my-cluster-kafka-bootstrap.kafka-server.svc:9092'
+  consumerGroup: knative-group
+  consumers: 4
+  initialOffset: latest
+  net:
+    sasl:
+      password: {}
+      type: {}
+      user: {}
+    tls:
+      caCert: {}
+      cert: {}
+      key: {}
+  sink:
+    ref:
+      apiVersion: messaging.knative.dev/v1beta1
+      kind: KafkaChannel
+      name: kafka-channel
+  topics:
+    - eventing.demo.topic
