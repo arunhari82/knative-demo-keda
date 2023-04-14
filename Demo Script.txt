@@ -1,3 +1,10 @@
+Install Redhat Openshift Serverless Operator:
+----------------------------------------------
+
+In the knative-serving namespace create a kantive serving instance. Please refer yaml knative-serving.yaml for creating the instance.
+In the knative-eventing namespace create an instance of knative eventing
+
+
 Basic Serving:
 -------------
 
@@ -93,41 +100,7 @@ kn source ping create test-ping-source \
     --data '{"message": "Welcome to Knative Eventing!"}' \
     --sink ksvc:event-display1
 
-#create an in-mem channel from the ui and link to the source and svcs
-
-#add a new kn service and link with the same event
-kn service create event-display2 \
-    --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
-    --scale-window=10s
-
-#create a channel for subscription from the ui
-kn channel list
-
-#list subscriptions
-kn subscription list
-
-kn service create event-display3 \
-    --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
-    --scale-window=10s
-
-#create kafka source from yaml
-oc create -f kafkasource.yaml
-
-# generate messages to the demo kafka topic (data source)
-oc -n eventing-demo run kafka-producer \
-    -ti --image=quay.io/strimzi/kafka:latest-kafka-2.7.0 --rm=true \
-    --restart=Never -- bin/kafka-console-producer.sh \
-    --broker-list my-cluster-kafka-bootstrap.amq-streams.svc.cluster.local:9092 \
-    --topic knative-demo-topic
-
-# create a broker from the UI
-kn service create event-display4 \
-    --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
-    --scale-window=10s
-
-# apply filters:
-type: rccl.ship.to.shore.event
-type: dev.knative.kafka.event
+# Please refer to Eventing Demo Directory for Deep dive with Channel and Broker Demo of eventing
 
 
 
@@ -155,3 +128,10 @@ kn func deploy -i quay.io/anattama/knative-nodefunc/nodefunc:latest -n functions
 
 
 curl https://nodefunc-functions-demo.apps.cluster-qm4ql.qm4ql.sandbox2523.opentlc.com?test=testdata
+
+
+Knative with Keda :
+---------------------
+# Please refer Keda-Demo directory and follow instructions
+# prerequisite : 
+    # Install Custom Metrics Autoscaler Operator

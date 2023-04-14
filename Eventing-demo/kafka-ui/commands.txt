@@ -1,3 +1,5 @@
+oc new-project kafka-server
+
 # Add Repo
 helm repo add kafka-ui https://provectus.github.io/kafka-ui
 
@@ -6,3 +8,6 @@ helm repo add kafka-ui https://provectus.github.io/kafka-ui
 
 # Install Kafka-UI
 helm install kafka-ui kafka-ui/kafka-ui --set yamlApplicationConfigConfigMap.name="kafka-ui-config",yamlApplicationConfigConfigMap.keyName="config.yml"
+
+# Create Route
+oc create route edge --service kafka-ui

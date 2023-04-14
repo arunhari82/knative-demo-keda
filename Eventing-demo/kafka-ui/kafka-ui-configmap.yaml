@@ -8,8 +8,10 @@ data:
   config.yml: |-
     kafka:
       clusters:
-        - name: openshift-kafka
+        - name: openshift-kafka-server
           bootstrapServers: my-cluster-kafka-bootstrap.kafka-server.svc.cluster.local:9092
+        - name: Keda-Kafka-Server
+          bootstrapServers: my-cluster-kafka-bootstrap.kafka-keda-knative.svc.cluster.local:9092
     auth:
       type: disabled
     management:
