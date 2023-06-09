@@ -72,3 +72,7 @@
     - name: Include keda-demo
       ansible.builtin.include_role:
         name: keda-demo
+
+    - name: Include kafka-ui
+      ansible.builtin.include_role:
+        name: kafka-ui

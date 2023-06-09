@@ -126,7 +126,4 @@ kn func deploy --remote
 
 === Knative with Keda :
 
-Please refer Keda-Demo directory and follow instructions.
-
-Prerequisite: 
-* Install Custom Metrics Autoscaler Operator
+Please refer keda-demo directory and follow instructions.
