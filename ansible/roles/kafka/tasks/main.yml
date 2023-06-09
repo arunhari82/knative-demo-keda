@@ -1,0 +1,99 @@
+- name: Evaluate AMQ Streams Operator
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: false
+    state: present
+    kind: Subscription
+    api_version: operators.coreos.com/v1alpha1
+    definition:
+      metadata:
+        name: amq-streams
+        namespace: openshift-operators
+      spec:
+        channel: stable
+        installPlanApproval: Automatic
+        name: amq-streams
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+
+- name: Wait for AMQ Streams operator to be running
+  kubernetes.core.k8s_info:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: false
+    api_version: v1
+    kind: Pod
+    namespace: openshift-operators
+    label_selectors:
+      - rht.comp=AMQ_Streams
+      - rht.subcomp=cluster-operator
+    field_selectors:
+      - status.phase=Running
+  register: r_streams_pod
+  retries: 10
+  delay: 10
+  until: r_streams_pod.resources | list | length == 1
+
+- name: Evaluate KafkaCluster
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    resource_definition: "{{ lookup('file', 'kafka-cluster.yml') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed
+
+- name: Wait for AMQ Streams cluster to be running
+  kubernetes.core.k8s_info:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: false
+    api_version: kafka.strimzi.io/v1beta2
+    kind: Kafka
+    namespace: '{{ kafka_project }}'
+    name: 'my-cluster'
+  register: r_kafka
+  retries: 20
+  delay: 15
+  until:
+    - r_kafka.resources[0] is defined
+    - r_kafka.resources[0].status is defined
+    - r_kafka.resources[0].status.conditions[0].type == 'Ready'
+    - r_kafka.resources[0].status.conditions[0].status == 'True' 
+
+- name: Evaluate kafka-ui ConfigMap
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    namespace: '{{ kafka_project }}'
+    state: present
+    resource_definition: "{{ lookup('template', 'kafka-ui-configmap.yml.j2') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed
+
+- name: Add stable chart repo
+  kubernetes.core.helm_repository:
+    name: kafka-ui
+    repo_url: "https://provectus.github.io/kafka-ui"
+
+- name: Deploy latest version of kafka-ui chart
+  kubernetes.core.helm:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    name: kafka-ui
+    chart_ref: kafka-ui/kafka-ui
+    release_namespace: '{{ kafka_project }}'
+    create_namespace: true
+    set_values:
+      - value: yamlApplicationConfigConfigMap.name=kafka-ui-config
+        value_type: string
+      - value: yamlApplicationConfigConfigMap.keyName=config.yml
+        value_type: string

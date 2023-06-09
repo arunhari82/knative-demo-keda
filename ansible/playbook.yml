@@ -1,0 +1,66 @@
+- hosts: localhost
+  name: Install Serverless Demo
+  vars:
+    delete_demo: false
+    verify_tls: false
+    insecure_skip_tls_verify: true
+    kafka_project: amq-streams
+    eventing_project: eventing-demo
+    functions_project: functions-demo
+  tasks:
+    - name: Check Required Parameters
+      ansible.builtin.fail:
+        msg: "This play requires 'server' and 'token' to be defined"
+      when:
+        - (server is undefined) or (token is undefined) or (server is none) or (token is none)
+      ignore_errors: false
+
+    - name: Set domain
+      ansible.builtin.set_fact:
+        domain: "{{ server | regex_replace('https://api.') | regex_replace(':6443') }}"
+
+    - name: Set Subdomain
+      ansible.builtin.set_fact:
+        route_subdomain: "apps.{{ domain }}"
+
+    - name: Evaluate Namespace {{ kafka_project }}
+      kubernetes.core.k8s:
+        api_key: '{{ token }}'
+        host: '{{ server }}'
+        validate_certs: false
+        api_version: v1
+        kind: Namespace
+        name: '{{ kafka_project }}'
+        state: present
+
+    - name: Evaluate Namespace {{ eventing_project }}
+      kubernetes.core.k8s:
+        api_key: '{{ token }}'
+        host: '{{ server }}'
+        validate_certs: false
+        api_version: v1
+        kind: Namespace
+        name: '{{ eventing_project }}'
+        state: present
+
+    - name: Evaluate Namespace {{ functions_project }}
+      kubernetes.core.k8s:
+        api_key: '{{ token }}'
+        host: '{{ server }}'
+        validate_certs: false
+        api_version: v1
+        kind: Namespace
+        name: '{{ functions_project }}'
+        state: present
+
+    - name: Include Tekton
+      ansible.builtin.include_role:
+        name: tekton
+
+    - name: Include Kafka
+      ansible.builtin.include_role:
+        name: kafka
+
+    - name: Include Knative
+      ansible.builtin.include_role:
+        name: knative
