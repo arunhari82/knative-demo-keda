@@ -64,3 +64,11 @@
     - name: Include Knative
       ansible.builtin.include_role:
         name: knative
+
+    # - name: Include Camel K
+    #   ansible.builtin.include_role:
+    #     name: camel-k
+
+    - name: Include keda-demo
+      ansible.builtin.include_role:
+        name: keda-demo

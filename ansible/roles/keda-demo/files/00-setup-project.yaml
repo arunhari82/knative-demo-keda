@@ -1,20 +1,17 @@
-apiVersion: project.openshift.io/v1
-kind: Project
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: kafka-keda-knative
+  name: keda-knative
   labels:
-    kubernetes.io/metadata.name: kafka-keda-knative
+    kubernetes.io/metadata.name: keda-knative
   annotations:
-    openshift.io/description: kafka-keda-knative
-spec:
-  finalizers:
-    - kubernetes
+    openshift.io/description: keda-knative
 ---
 kind: Kafka
 apiVersion: kafka.strimzi.io/v1beta2
 metadata:
   name: my-cluster
-  namespace: kafka-keda-knative
+  namespace: keda-knative
 spec:
   kafka:
     replicas: 3
@@ -49,7 +46,7 @@ metadata:
   name: my-topic
   labels:
     strimzi.io/cluster: my-cluster
-  namespace: kafka-keda-knative
+  namespace: keda-knative
 spec:
   partitions: 10
   replicas: 3

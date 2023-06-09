@@ -2,6 +2,7 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: quarkus-eda-knative-demo
+  namespace: keda-knative
 spec:
   template:
     metadata:

@@ -59,7 +59,7 @@
   delay: 10
   until: r_serverless_pod.resources | list | length == 1
 
-- name: Evaluate KnativeServing
+- name: Evaluate KnativeEventing
   kubernetes.core.k8s:
     api_key: '{{ token }}'
     host: '{{ server }}'
@@ -100,6 +100,18 @@
   loop:
     - func-s2i.yaml
     - func-deploy.yaml
+  retries: 10
+  delay: 10
+  until: not _serving.failed
+
+- name: Evaluate KnativeKafka
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    resource_definition: "{{ lookup('template', 'knative-kafka.yml.j2') }}"
+  register: _serving
   retries: 10
   delay: 10
   until: not _serving.failed

@@ -2,7 +2,7 @@ apiVersion: sources.knative.dev/v1beta1
 kind: KafkaSource
 metadata:
   name: kafka-source
-  namespace: kafka-keda-knative
+  namespace: keda-knative
   annotations:
     autoscaling.knative.dev/class: keda.autoscaling.knative.dev
     autoscaling.knative.dev/minScale: "0" 
@@ -13,7 +13,7 @@ metadata:
 spec:
   consumerGroup: knative-group
   bootstrapServers:
-    - my-cluster-kafka-bootstrap.kafka-keda-knative:9092
+    - my-cluster-kafka-bootstrap.keda-knative:9092
   topics:
     - my-topic
   sink:

@@ -1,0 +1,7 @@
+= KEDA demo
+
+The application and services are already configured for you. Just generate a request load by creating the job:
+
+----
+oc create -f 99-load-job.yaml -n keda-knative
+----

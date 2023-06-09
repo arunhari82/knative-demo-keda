@@ -1,0 +1,16 @@
+- name: Evaluate keda-demo Manisfests
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    resource_definition: "{{ lookup('file', item) }}"
+  register: _serving
+  retries: 1
+  delay: 10
+  until: not _serving.failed
+  loop:
+    - 00-setup-project.yaml
+    - 01-autoscaler-keda.yaml
+    - 04-keda-knative-service.yaml
+    - 05-kafkasource-keda-knative.yaml

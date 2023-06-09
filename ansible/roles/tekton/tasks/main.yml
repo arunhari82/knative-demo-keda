@@ -45,6 +45,6 @@
   register: crd_result
   retries: 30
   delay: 10
-  until: 
+  until:
     - crd_result.resources is defined
     - crd_result.resources | length > 0
