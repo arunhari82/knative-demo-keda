@@ -65,13 +65,21 @@
       ansible.builtin.include_role:
         name: knative
 
-    # - name: Include Camel K
-    #   ansible.builtin.include_role:
-    #     name: camel-k
+    - name: Include Camel K
+      ansible.builtin.include_role:
+        name: camel-k
 
     - name: Include keda-demo
       ansible.builtin.include_role:
         name: keda-demo
+
+    - name: Include broker-demo
+      ansible.builtin.include_role:
+        name: broker-demo
+
+    - name: Include channel-demo
+      ansible.builtin.include_role:
+        name: channel-demo
 
     - name: Include kafka-ui
       ansible.builtin.include_role:

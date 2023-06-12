@@ -1,0 +1,12 @@
+= Eveting Demo
+
+== Broker Demo
+
+== Channel Demo 
+
+To active the services and start sending messages just create `camel-source.yml` and `ping-source.yml`
+
+----
+oc create -f camel-source.yml -n eventing-demo
+oc create -f ping-source.yml -n eventing-demo
+----

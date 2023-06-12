@@ -6,7 +6,6 @@ metadata:
     sources.knative.dev/creator: opentlc-mgr
     sources.knative.dev/lastModifier: opentlc-mgr
   name: ping-source
-  generation: 3
   labels:
     app: ping-source
     app.kubernetes.io/component: ping-source

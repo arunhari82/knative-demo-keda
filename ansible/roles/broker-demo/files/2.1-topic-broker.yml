@@ -3,11 +3,9 @@ kind: KafkaTopic
 metadata:
   labels:
     strimzi.io/cluster: my-cluster
-  name: eventing.demo.topic
-  namespace: kafka-server
+  name: eventing.broker.demo
 spec:
   config: {}
   partitions: 1
   replicas: 3
-  topicName: eventing.demo.topic
-
+  topicName: eventing.broker.demo

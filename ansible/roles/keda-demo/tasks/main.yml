@@ -1,3 +1,55 @@
+- name: Evaluate Namespace keda-knative
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: false
+    api_version: v1
+    kind: Namespace
+    name: keda-knative
+    state: present
+
+- name: Evaluate KafkaCluster
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    resource_definition: "{{ lookup('file', 'kafka-cluster.yml') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed
+
+- name: Wait for AMQ Streams cluster to be running
+  kubernetes.core.k8s_info:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: false
+    api_version: kafka.strimzi.io/v1beta2
+    kind: Kafka
+    namespace: keda-knative
+    name: 'my-cluster'
+  register: r_kafka
+  retries: 20
+  delay: 15
+  until:
+    - r_kafka.resources[0] is defined
+    - r_kafka.resources[0].status is defined
+    - r_kafka.resources[0].status.conditions[0].type == 'Ready'
+    - r_kafka.resources[0].status.conditions[0].status == 'True'
+
+- name: Evaluate Topic
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    state: present
+    resource_definition: "{{ lookup('file', 'topic.yml') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed
+
 - name: Evaluate keda-demo Manisfests
   kubernetes.core.k8s:
     api_key: '{{ token }}'
@@ -10,7 +62,6 @@
   delay: 10
   until: not _serving.failed
   loop:
-    - 00-setup-project.yaml
     - 01-autoscaler-keda.yaml
     - 04-keda-knative-service.yaml
     - 05-kafkasource-keda-knative.yaml
