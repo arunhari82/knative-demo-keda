@@ -1,8 +1,6 @@
 apiVersion: sources.knative.dev/v1beta1
 kind: KafkaSource
 metadata:
-  annotations:
-    openshift.io/generated-by: OpenShiftWebConsole
   name: broker-source
   labels:
     app: broker-source
@@ -12,7 +10,7 @@ metadata:
     app.kubernetes.io/part-of: broker-demo
 spec:
   bootstrapServers:
-    - 'my-cluster-kafka-bootstrap.kafka-server.svc:9092'
+    - 'my-cluster-kafka-bootstrap.amq-streams.svc:9092'
   consumerGroup: knative-broker-group
   consumers: 1
   initialOffset: latest

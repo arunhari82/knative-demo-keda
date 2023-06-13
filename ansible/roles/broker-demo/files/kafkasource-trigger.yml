@@ -1,10 +1,7 @@
 apiVersion: eventing.knative.dev/v1
 kind: Trigger
 metadata:
-  annotations:
-    eventing.knative.dev/creator: opentlc-mgr
-    eventing.knative.dev/lastModifier: opentlc-mgr
-  name: invoice-trigger
+  name: kafka-source-trigger
   finalizers:
     - kafka.triggers.eventing.knative.dev
     - kafka.namespaced.triggers.eventing.knative.dev
@@ -15,10 +12,10 @@ spec:
   broker: broker-demo
   filter:
     attributes:
-      kafkaheadersubject: invoice
+      source: /apis/v1/namespaces/eventing-demo/kafkasources/broker-source#eventing.broker.demo
   subscriber:
     ref:
       apiVersion: serving.knative.dev/v1
       kind: Service
-      name: invoice-service-display
+      name: kafka-display
       namespace: eventing-demo

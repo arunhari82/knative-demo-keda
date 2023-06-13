@@ -2,7 +2,16 @@
 
 == Demo installation
 
-=== Parameters
+== Requirements
+
+You will need Ansible installed in your workstation to deploy this workshop.
+
+* https://www.ansible.com/[Ansible 3]
+- https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements[Ansible's requirement]
+* https://pypi.org/project/kubernetes/[Python's Kubernetes module]
+* OpenShift Workshop 4.12
+
+=== Automation Parameters
 
 [options="header"]
 |=======================
@@ -17,97 +26,78 @@
 ansible-playbook -e token=${token} -e server=${server} playbook.yml
 ----
 
+== Basic commands
 
-== Old Script
-=== Basic Serving:
+=== Basic Serving
 
-    kn service create hello-knative --image="quay.io/naveenkendyala/quarkus-demo-quarkusjvm-hello:v1"
+----
+kn service create hello-knative --image="quay.io/naveenkendyala/quarkus-demo-quarkusjvm-hello:v1"
 
-    kn service list
+kn service list
 
-    export URL=$(kn service list | tail -1 | awk '{print $2}')/api/hello
+export URL=$(kn service list | tail -1 | awk '{print $2}')/api/hello
 
-    hey -c 50 -z 10s $URL
+hey -c 50 -z 10s $URL
 
-    kn service update hello-knative --concurrency-limit=10
+kn service update hello-knative --concurrency-limit=10
 
-    hey -c 50 -z 10s $URL
+hey -c 50 -z 10s $URL
 
-    oc get kpa
+oc get kpa
+----
 
 === Blue/Green Deployments
 
-    kn service create example-svc \
-    --image quay.io/redhattraining/do244-serving-manage \
-    --revision-name example-svc-revision-1-blue \
-    --env TARGET="Revision Blue" -n serving-demo
+----
+kn service create example-svc \
+--image quay.io/redhattraining/do244-serving-manage \
+--revision-name example-svc-revision-1-blue \
+--env TARGET="Revision Blue" -n serving-demo
 
-    export URL=$(kn service list | tail -1 | awk '{print $2}')
+export URL=$(kn service list | tail -1 | awk '{print $2}')
 
-    curl $URL
+curl $URL
 
-    while true
-    do
-    curl $URL 
-    sleep 1
-    done
+while true
+do
+curl $URL 
+sleep 1
+done
 
-    kn service update example-svc \
-    --revision-name example-svc-revision-2-green \
-    --env TARGET="Revision Green"
+kn service update example-svc \
+--revision-name example-svc-revision-2-green \
+--env TARGET="Revision Green"
+----
 
 === Traffic Splitting
 
-    kn service update example-svc --traffic example-svc-revision-1-blue=100
+----
+kn service update example-svc --traffic example-svc-revision-1-blue=100
 
-    kn service update example-svc \
-    --traffic example-svc-revision-1-blue=80 \
-    --traffic example-svc-revision-2-green=20
-
-Show Topology for traffic splits in developer perspective:
-
-* Click and change
-
+kn service update example-svc \
+--traffic example-svc-revision-1-blue=80 \
+--traffic example-svc-revision-2-green=20
+----
 
 === Eventing
 
-    oc project eventing-demo
+----
+oc project eventing-demo
 
-    kn service create event-display1 \
-        --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
-        --scale-window 10s
+kn service create event-display1 \
+    --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
+    --scale-window 10s
+----        
 
 Ping Source, API Source, Kafka Source    
 
     kn source ping create test-ping-source \
         --schedule "*/1 * * * *" \
         --data '{"message": "Welcome to Knative Eventing!"}' \
-        --sink ksvc:event-display1
+        --sink ksvc:event-display
 
-Eventing:
 
-Create a new project for kafka cluster
-
-    oc project amq-streams
-
-Create the cluster
-
-    oc create -n amq-streams -f kafka-cluster.yaml
-
-Create a new project for the demo
-
-    oc project eventing-demo
-
-    kn service create event-display1 \
-        --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
-        --scale-window 10s
-
-    kn source ping create test-ping-source \
-        --schedule "*/1 * * * *" \
-        --data '{"message": "Welcome to Knative Eventing!"}' \
-        --sink ksvc:event-display1
-
-Please refer to Eventing Demo Directory for Deep dive with Channel and Broker Demo of eventing
+Please, refer to `eventing-demo` link:eventing-demo/README.adoc[instructions] for deep-dive with Channel and Broker eventing.
 
 === Functions Demo 
 
@@ -126,4 +116,4 @@ kn func deploy --remote
 
 === Knative with Keda :
 
-Please refer keda-demo directory and follow instructions.
+Please refer keda-demo directory and follow link:keda-demo/README.adoc[instructions].

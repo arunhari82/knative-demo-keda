@@ -39,8 +39,8 @@
       kn service create {{ item }} --image quay.io/openshift-knative/knative-eventing-sources-event-display
        --label app.kubernetes.io/part-of=broker-demo -n eventing-demo
   loop:
-    - order-service-display
-    - invoice-service-display
+    - kafka-display
+    - ping-display
   register: my_output
   changed_when: my_output.rc != 0
 
@@ -58,6 +58,6 @@
   until: not _serving.failed
   loop:
     - 3-eventing-broker.yml
-    - 4.1-trigger-invoice.yml
-    - 4.2-trigger-order.yml
+    - kafkasource-trigger.yml
+    - ping-trigger.yml
     - 5-broker-source.yml
