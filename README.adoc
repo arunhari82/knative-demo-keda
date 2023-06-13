@@ -101,6 +101,8 @@ Please, refer to `eventing-demo` link:eventing-demo/README.adoc[instructions] fo
 
 === Functions Demo 
 
+To deploy an example function:
+
 ----
 oc login
 
@@ -113,6 +115,26 @@ cd demo_quarkus-fuction
 kn func deploy --remote
 ----
 
+To test using custom data: 
+
+----
+export URL=$(kn route list | tail -1 | awk '{print $2}')
+
+curl $URL -X POST \
+-H "Content-Type: application/json" \
+-H "Ce-SpecVersion: 1.0" \
+-H "Ce-Type: withBeans" \
+-H "Ce-Source: cURL" \
+-H "Ce-Id: 42" \
+-d '{"message": "Hello there."}'
+
+----
+
+or just use invoke:
+
+----
+kn func invoke
+----
 
 === Knative with Keda :
 
