@@ -14,7 +14,7 @@
 - name: Add stable chart repo
   kubernetes.core.helm_repository:
     name: kafka-ui
-    repo_url: "https://provectus.github.io/kafka-ui"
+    repo_url: "https://provectus.github.io/kafka-ui-charts"
 
 - name: Deploy latest version of kafka-ui chart
   kubernetes.core.helm:
