@@ -136,6 +136,6 @@ or just use invoke:
 kn func invoke
 ----
 
-=== Knative with Keda :
+=== Knative with Keda
 
-Please refer keda-demo directory and follow link:keda-demo/README.adoc[instructions].
+Please, refer to `keda-demo` directory and follow link:keda-demo/README.adoc[instructions].
