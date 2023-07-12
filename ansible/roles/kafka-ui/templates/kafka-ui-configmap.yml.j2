@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kafka-ui-config
+  immutable: false
+data:
+  config.yml: |-
+    kafka:
+      clusters:
+        - name: my-server
+          bootstrapServers: my-cluster-kafka-bootstrap.{{ kafka_project }}.svc.cluster.local:9092
+        - name: keda-server
+          bootstrapServers: my-cluster-kafka-bootstrap.keda-knative.svc.cluster.local:9092
+    auth:
+      type: disabled
+    management:
+      health:
+        ldap:
+          enabled: false

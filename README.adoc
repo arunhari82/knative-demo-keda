@@ -1,0 +1,141 @@
+= knative-demo
+
+== Demo installation
+
+== Requirements
+
+You will need Ansible installed in your workstation to deploy this workshop.
+
+* https://www.ansible.com/[Ansible 3]
+- https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements[Ansible's requirement]
+* https://pypi.org/project/kubernetes/[Python's Kubernetes module]
+* OpenShift Workshop 4.12
+
+=== Automation Parameters
+
+[options="header"]
+|=======================
+| Parameter | Example Value                                      | Definition
+| token     | sha256~vFanQbthlPKfsaldJT3bdLXIyEkd7ypO_XPygY1DNtQ | access token for a user with cluster-admin privileges
+| server    | https://api.mycluster.domain.com:6443              | OpenShift cluster API URL
+|=======================
+
+===  How to run the playbook
+
+----
+ansible-playbook -e token=${token} -e server=${server} playbook.yml
+----
+
+== Basic commands
+
+=== Basic Serving
+
+----
+kn service create hello-knative --image="quay.io/naveenkendyala/quarkus-demo-quarkusjvm-hello:v1"
+
+kn service list
+
+export URL=$(kn service list | tail -1 | awk '{print $2}')/api/hello
+
+hey -c 50 -z 10s $URL
+
+kn service update hello-knative --concurrency-limit=10
+
+hey -c 50 -z 10s $URL
+
+oc get kpa
+----
+
+=== Blue/Green Deployments
+
+----
+kn service create example-svc \
+--image quay.io/redhattraining/do244-serving-manage \
+--revision-name example-svc-revision-1-blue \
+--env TARGET="Revision Blue" -n serving-demo
+
+export URL=$(kn service list | tail -1 | awk '{print $2}')
+
+curl $URL
+
+while true
+do
+curl $URL 
+sleep 1
+done
+
+kn service update example-svc \
+--revision-name example-svc-revision-2-green \
+--env TARGET="Revision Green"
+----
+
+=== Traffic Splitting
+
+----
+kn service update example-svc --traffic example-svc-revision-1-blue=100
+
+kn service update example-svc \
+--traffic example-svc-revision-1-blue=80 \
+--traffic example-svc-revision-2-green=20
+----
+
+=== Eventing
+
+----
+oc project eventing-demo
+
+kn service create event-display1 \
+    --image quay.io/openshift-knative/knative-eventing-sources-event-display:latest \
+    --scale-window 10s
+----        
+
+Ping Source, API Source, Kafka Source    
+
+    kn source ping create test-ping-source \
+        --schedule "*/1 * * * *" \
+        --data '{"message": "Welcome to Knative Eventing!"}' \
+        --sink ksvc:event-display
+
+
+Please, refer to `eventing-demo` link:eventing-demo/README.adoc[instructions] for deep-dive with Channel and Broker eventing.
+
+=== Functions Demo 
+
+To deploy an example function:
+
+----
+oc login
+
+oc project functions-demo
+
+git clone https://github.com/GuilhermeCamposo/demo_quarkus-function.git
+
+cd demo_quarkus-fuction
+
+kn func deploy --remote
+----
+
+To test using custom data: 
+
+----
+export URL=$(kn route list | tail -1 | awk '{print $2}')
+
+curl $URL -X POST \
+-H "Content-Type: application/json" \
+-H "Ce-SpecVersion: 1.0" \
+-H "Ce-Type: withBeans" \
+-H "Ce-Source: cURL" \
+-H "Ce-Id: 42" \
+-d '{"message": "Hello there."}'
+
+----
+
+or just use invoke:
+
+----
+kn func invoke
+----
+
+=== Knative with Keda
+
+Please, refer to `keda-demo` directory and follow link:keda-demo/README.adoc[instructions].

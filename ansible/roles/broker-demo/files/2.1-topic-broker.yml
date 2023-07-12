@@ -1,0 +1,11 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: my-cluster
+  name: eventing.broker.demo
+spec:
+  config: {}
+  partitions: 1
+  replicas: 3
+  topicName: eventing.broker.demo

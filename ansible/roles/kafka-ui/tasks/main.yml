@@ -1,0 +1,45 @@
+- name: Evaluate kafka-ui ConfigMap
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    namespace: '{{ kafka_project }}'
+    state: present
+    resource_definition: "{{ lookup('template', 'kafka-ui-configmap.yml.j2') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed
+
+- name: Add stable chart repo
+  kubernetes.core.helm_repository:
+    name: kafka-ui
+    repo_url: "https://provectus.github.io/kafka-ui-charts"
+
+- name: Deploy latest version of kafka-ui chart
+  kubernetes.core.helm:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    name: kafka-ui
+    chart_ref: kafka-ui/kafka-ui
+    release_namespace: '{{ kafka_project }}'
+    create_namespace: true
+    set_values:
+      - value: yamlApplicationConfigConfigMap.name=kafka-ui-config
+        value_type: string
+      - value: yamlApplicationConfigConfigMap.keyName=config.yml
+        value_type: string
+
+- name: Evaluate kafka-ui Route
+  kubernetes.core.k8s:
+    api_key: '{{ token }}'
+    host: '{{ server }}'
+    validate_certs: '{{ verify_tls }}'
+    namespace: '{{ kafka_project }}'
+    state: present
+    resource_definition: "{{ lookup('file', 'route.yml') }}"
+  register: _kafka
+  retries: 10
+  delay: 10
+  until: not _kafka.failed

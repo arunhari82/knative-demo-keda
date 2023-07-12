@@ -1,0 +1,21 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: ping-trigger
+  finalizers:
+    - kafka.triggers.eventing.knative.dev
+    - kafka.namespaced.triggers.eventing.knative.dev
+  labels:
+    eventing.knative.dev/broker: kafka-broker-sample
+    app.kubernetes.io/part-of: broker-demo
+spec:
+  broker: broker-demo
+  filter:
+    attributes:
+      source: /apis/v1/namespaces/eventing-demo/pingsources/ping-source
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: ping-display
+      namespace: eventing-demo
